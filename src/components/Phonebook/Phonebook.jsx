@@ -26,7 +26,7 @@ const Phonebook = () => {
         if (name.trim() !== '' && number.trim() !== '') {
             const existingContact = contacts.find(contact => contact.contactName === name || contact.phoneNumber === number)
             if (existingContact) {
-                alert('You already added this contact!');
+                alert(`You already added this contact: ${existingContact.contactName} (${existingContact.phoneNumber})`);
             } else {
                 const newContact = {
                     id: nanoid(),
