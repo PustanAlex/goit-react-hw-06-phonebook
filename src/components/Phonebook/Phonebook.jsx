@@ -2,60 +2,39 @@ import AddContactInput from 'components/AddContactInput/AddContactInput';
 import AddNumberInput from 'components/AddNumberInput/AddNumberInput';
 import Contacts from 'components/Contacts/Contacts';
 import style from './Phonebook.module.css';
-import { nanoid } from 'nanoid';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact, deleteContact, setName, setNumber, setFilter } from 'components/Redux/phonebookSlice';
 
 const Phonebook = () => {
 
-    const [name, setName] = useState(localStorage.getItem('nameChange') || '');
-    const storedContacts = JSON.parse(localStorage.getItem('contacts'));
-    const initialContacts = Array.isArray(storedContacts) ? storedContacts : [];
-    const [contacts, setContacts] = useState(initialContacts);
-    const [number, setNumber] = useState(localStorage.getItem('numberChange') || '');
-    const [filter, setFilter] = useState('');
-
-
-    useEffect( () => {
-        localStorage.setItem('nameChange', name);
-        localStorage.setItem('contacts', JSON.stringify(contacts));
-        localStorage.setItem('numberChange', number);
-    }, [name, contacts, number]);
+   const dispatch = useDispatch();
+   const name = useSelector( state => state.contacts.name );
+   const contacts = useSelector (state => state.contacts.contacts);
+   const number = useSelector ( state => state.contacts.number);
+   const filter = useSelector ( state => state.contacts.filter);
 
     const handleAddContact = () => {
         if (name.trim() !== '' && number.trim() !== '') {
-            const existingContact = contacts.find(contact => contact.contactName === name || contact.phoneNumber === number)
-            if (existingContact) {
-                alert(`You already added this contact: ${existingContact.contactName} (${existingContact.phoneNumber})`);
-            } else {
-                const newContact = {
-                    id: nanoid(),
-                    contactName: name,
-                    phoneNumber: number,
-                } 
-                setContacts([ ...contacts, newContact])
-            }
-            setName('')
-            setNumber('')
-        } 
-    };
+            dispatch(addContact({ contactName: name, phoneNumber: number}));
+            dispatch(setName(''));
+            dispatch(setNumber(''));
+        }
+    }
 
     const handleDeleteContact = (id) => {
-        const updatedContactList = contacts.filter ( contact => contact.id !== id)
-        setContacts(updatedContactList)
-        localStorage.setItem('contact', JSON.stringify(updatedContactList));
+      dispatch(deleteContact(id));
     };
 
     const handleNameChange = e => {
-        setName(e.target.value);
+        dispatch(setName(e.target.value));
     };
 
     const handleNumberChange = e => {
-        setNumber(e.target.value);
+        dispatch(setNumber(e.target.value));
     };
     
     const handleContactFilter = e => {
-        setFilter(e.target.value);
+        dispatch(setFilter(e.target.value));
     };
 
 
